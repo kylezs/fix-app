@@ -1,31 +1,69 @@
+import axios from 'axios';
 import {StatusBar} from 'expo-status-bar';
-import React from 'react';
-import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
+import JailMonkey from 'jail-monkey';
+import React, {useState} from 'react';
+import {Button, StyleSheet, Text, View} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 
-export default function App() {
-  const onScan =
-      () => {
-        console.log('Hello, scan ran');
-      }
+const axiosInstance = axios.create({withCredentials: true, baseURL: '<test>'})
 
-  const styles = StyleSheet
+export default function App() {
+
+  const [isResultPage, setIsResultPage] = useState(false);
+
+  const onScan = async () => {
+
+    const timeOfScanUTC = new Date().toUTCString();
+    const boolPinOrFinger = await DeviceInfo.isPinOrFingerprintSet()
+    const intPinOrFinger = boolPinOrFinger ? 1 : 0;
+
+    const myDevice = DeviceInfo.getUniqueId();
+    // android, ios, windows...
+    const platform = DeviceInfo.getSystemName();
+    const version = DeviceInfo.getSystemVersion();
+
+    const locServicesEnabledBool = await DeviceInfo.isLocationEnabled();
+    // A pass is if location services are OFF, i.e. not enabled
+    const locServicesPassInt = locServicesEnabledBool ? 0 : 1;
+
+    const isJailBroken = JailMonkey.isJailBroken();
+    // a pass if it's NOT jailbroken
+    const isNotJailBrokenInt = isJailBroken ? 0 : 1;
+
+    const data = JSON.stringify({
+      'UUID': myDevice,
+      '@timestamp': timeOfScanUTC,
+      'pinOrFingerPrintPass': intPinOrFinger,
+      'locationServicesPass': locServicesPassInt,
+      'platform': platform,
+      'version': version,
+      'isNotJailBroken': isNotJailBrokenInt,
+    });
+
+    const config = {
+      auth: {
+        username: '<test>',
+        password: '<test>',
+      },
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }
+
+    axiosInstance.post('<test>', data, config
+    ).then((res) => {
+      console.log('Result from elastic search')
+      console.log(res)
+    }).catch((err) => {
+      console.log('Woops, err here: ', err)
+    })
+
+  }
 
   return (
     <View style={styles.container}>
       <Text>Please run a scan</Text>
-      <FlatList>
-      <View style={styles}>
-        <Text>OS Version: 0.0.0</Text>
-        </View>
-        <View>
-        <Text>OS Version: 0.0.0</Text>
-        </View>
-        <View>
-        <Text>OS Version: 0.0.0</Text>
-        </View>
-      </FlatList>
       <Button onPress={onScan} title='Scan' />
       <StatusBar style='auto' />
     </View>
