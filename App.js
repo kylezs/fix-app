@@ -4,9 +4,10 @@ import JailMonkey from 'jail-monkey';
 import React, {useState} from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import {ES_INDEX_PATH, ES_PASSWORD, ES_URL, ES_USERNAME} from 'react-native-dotenv';
 
 
-const axiosInstance = axios.create({withCredentials: true, baseURL: '<test>'})
+const axiosInstance = axios.create({withCredentials: true, baseURL: ES_URL})
 
 export default function App() {
 
@@ -43,18 +44,25 @@ export default function App() {
 
     const config = {
       auth: {
-        username: '<test>',
-        password: '<test>',
+        username: ES_USERNAME,
+        password: ES_PASSWORD,
       },
       headers: {
           'Content-Type': 'application/json'
       }
     }
 
-    axiosInstance.post('<test>', data, config
+    axiosInstance.post(ES_INDEX_PATH, data, config
     ).then((res) => {
       console.log('Result from elastic search')
       console.log(res)
+      console.log('res status: ' + res.status)
+      if (res.status === 201) {
+        // Show the results of their privacy settings.
+        setIsResultPage(true);
+      } else {
+        console.error('Something went wrong sending the data to the dashboard')
+      }
     }).catch((err) => {
       console.log('Woops, err here: ', err)
     })
