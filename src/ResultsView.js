@@ -1,18 +1,24 @@
 import React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 
-export default function ResultsView({setIsResultPage}) {
-  const onReturnHome = () => {
-    setIsResultPage(false);
-  }
-
+export default function ResultsView({result}) {
   return (
     <View style={styles.container}>
       <Text>Here are your results</Text>
-      <Button title="Return home" onPress={onReturnHome} />
+      <Text>
+        {result}
+      </Text>
     </View>
   );
 }
+
+const Item = ({item}) => (
+  <View>
+    <Text>
+      {item.key}: {item.value}
+    </Text>
+    </View>
+)
 
 const styles = StyleSheet.create({
   container: {
