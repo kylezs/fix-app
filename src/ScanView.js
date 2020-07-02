@@ -1,15 +1,13 @@
+import {StatusBar} from 'expo-status-bar';
 import React from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
 
-export default function ResultsView({setIsResultPage}) {
-  const onReturnHome = () => {
-    setIsResultPage(false);
-  }
-
+export default ScanView = ({onScan}) => {
   return (
     <View style={styles.container}>
-      <Text>Here are your results</Text>
-      <Button title="Return home" onPress={onReturnHome} />
+      <Text>Please run a scan</Text>
+      <Button onPress={onScan} title='Scan' />
+      <StatusBar style='auto' />
     </View>
   );
 }

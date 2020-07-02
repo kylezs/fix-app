@@ -1,20 +1,19 @@
 import axios from 'axios';
-import {StatusBar} from 'expo-status-bar';
 import JailMonkey from 'jail-monkey';
 import React, {useState} from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import {ES_INDEX_PATH, ES_PASSWORD, ES_URL, ES_USERNAME} from 'react-native-dotenv';
+
+import ResultsView from './src/ResultsView';
+import ScanView from './src/ScanView'
 
 
 const axiosInstance = axios.create({withCredentials: true, baseURL: ES_URL})
 
 export default function App() {
-
   const [isResultPage, setIsResultPage] = useState(false);
 
   const onScan = async () => {
-
     const timeOfScanUTC = new Date().toUTCString();
     const boolPinOrFinger = await DeviceInfo.isPinOrFingerprintSet()
     const intPinOrFinger = boolPinOrFinger ? 1 : 0;
@@ -42,47 +41,33 @@ export default function App() {
       'isNotJailBroken': isNotJailBrokenInt,
     });
 
-    const config = {
-      auth: {
-        username: ES_USERNAME,
-        password: ES_PASSWORD,
-      },
-      headers: {
-          'Content-Type': 'application/json'
-      }
-    }
+    const config =
+        {
+          auth: {
+            username: ES_USERNAME,
+            password: ES_PASSWORD,
+          },
+          headers: {'Content-Type': 'application/json'}
+        }
 
-    axiosInstance.post(ES_INDEX_PATH, data, config
-    ).then((res) => {
-      console.log('Result from elastic search')
-      console.log(res)
-      console.log('res status: ' + res.status)
-      if (res.status === 201) {
-        // Show the results of their privacy settings.
-        setIsResultPage(true);
-      } else {
-        console.error('Something went wrong sending the data to the dashboard')
-      }
-    }).catch((err) => {
-      console.log('Woops, err here: ', err)
-    })
+        axiosInstance.post(ES_INDEX_PATH, data, config)
+            .then((res) => {
+              console.log('Result from elastic search')
+              console.log(res)
+              console.log('res status: ' + res.status)
+              if (res.status === 201) {
+                // Show the results of their privacy settings.
+                setIsResultPage(true);
+              }
+              else {
+                console.error(
+                    'Something went wrong sending the data to the dashboard')
+              }
+            })
+            .catch((err) => {console.log('Woops, err here: ', err)})
 
   }
 
-  return (
-    <View style={styles.container}>
-      <Text>Please run a scan</Text>
-      <Button onPress={onScan} title='Scan' />
-      <StatusBar style='auto' />
-    </View>
-  );
+  return (isResultPage ? <ResultsView setIsResultPage={
+    setIsResultPage} /> : <ScanView onScan={onScan} />);
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
