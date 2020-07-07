@@ -10,6 +10,7 @@ import {
   ES_USERNAME,
 } from "react-native-dotenv";
 import AsyncStorage from "@react-native-community/async-storage";
+import { RESULTS_SCREEN } from "../constants";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ES_URL });
 
@@ -17,45 +18,39 @@ const axiosInstance = axios.create({ withCredentials: true, baseURL: ES_URL });
 const LAST_SCAN_TIME_KEY = "@last_scan_time";
 
 export default ScanView = ({ navigation }) => {
-  // split up onScan()
-  const sendToEs = async () => {
-    return;
-  };
-
   const onScan = async () => {
     const timeOfScan = new Date();
+
+    let canScan;
     // First check if we can scan
     try {
       // Stored in UTC
       const lastScan = await AsyncStorage.getItem(LAST_SCAN_TIME_KEY);
-      // Will convert UTC String to local time
-      const lastScanDate = new Date(lastScan);
-      console.log("Last scan date in local time");
-      console.log(lastScanDate);
 
       // number of milliseconds since beginning of time
       let aDayLater = new Date(lastScan);
       aDayLater.setDate(aDayLater.getDate() + 1);
       console.log(aDayLater);
 
-      let canScan = aDayLater < timeOfScan ? true : false;
+      canScan = aDayLater < timeOfScan ? true : false;
       if (!canScan) {
-        console.log("Tell the user they must wait.");
         const milliToWait = aDayLater - timeOfScan;
-        const hoursToWait = (milliToWait / (1000 * 60 * 60)).toFixed(1);
-        console.log(
-          `You must wait ${hoursToWait} hours until you can scan again`
-        );
-        // Don't continue
-        return;
+        const hoursToWait = (milliToWait / (1000 * 60 * 60)).toFixed(4);
+        const wholeHours = Math.floor(hoursToWait);
+        const minutesToWait = ((hoursToWait - wholeHours) * 60).toFixed(0);
+
+        // Currently just alerts
+        // alert(
+        //   `You must wait ${wholeHours} hours and ${minutesToWait} minutes until you can rescan`
+        // );
+        // // Don't continue
+        // return;
       }
     } catch {
       console.error("There was a problem reading from asyncStorage");
       return;
     }
 
-    // store as UTC for consistency with other indexed logs
-    const timeOfScanUTC = timeOfScan.toUTCString();
     const boolPinOrFinger = await DeviceInfo.isPinOrFingerprintSet();
     const intPinOrFinger = boolPinOrFinger ? 1 : 0;
 
@@ -74,7 +69,7 @@ export default ScanView = ({ navigation }) => {
 
     const result = {
       UUID: myDevice,
-      "@timestamp": timeOfScanUTC,
+      "@timestamp": timeOfScan,
       pinOrFingerPrintPass: intPinOrFinger,
       locationServicesPass: locServicesPassInt,
       platform: platform,
@@ -100,11 +95,9 @@ export default ScanView = ({ navigation }) => {
         console.log("res status: " + res.status);
         if (res.status === 201) {
           // If all is successful, update the last scan time
-          await AsyncStorage.setItem(LAST_SCAN_TIME_KEY, timeOfScanUTC);
+          // await AsyncStorage.setItem(LAST_SCAN_TIME_KEY, timeOfScan);
 
-          // Show the results of their privacy settings.
-          // show the results page
-          navigation.push("Results", {
+          navigation.push(RESULTS_SCREEN, {
             result: result,
           });
         } else {
@@ -114,7 +107,7 @@ export default ScanView = ({ navigation }) => {
         }
       })
       .catch((err) => {
-        console.log("Error sending data to elasticsearch ", err);
+        console.error("Error sending data to elasticsearch ", err);
       });
   };
   return (
@@ -133,6 +126,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 16,
+    fontSize: 24,
+    marginBottom: 10,
   },
 });

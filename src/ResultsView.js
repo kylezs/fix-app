@@ -14,10 +14,13 @@ export default function ResultsView({ route, navigation }) {
     flatListKvPairs.push({ key: property, value: data[property] });
   }
 
+  // Split into two lists Metadata and tested things
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Here are your results</Text>
       <FlatList
+        style={styles.flatList}
         data={flatListKvPairs}
         renderItem={({ item, index }) => <Item key={index} item={item} />}
       />
@@ -35,13 +38,16 @@ const Item = ({ item }) => {
     conditionalStyle = item.value === 1 ? itemSuccess : itemFail;
   } else {
     // Only the metadata items (e.g. UUID, @timestamp)
-    value = item.value;
+    if (item.key === "@timestamp") {
+      value = item.value.toLocaleString();
+    } else {
+      value = item.value;
+    }
   }
   return (
     <View style={conditionalStyle}>
-      <Text style={styles.itemText}>
-        {item.key}: {value}
-      </Text>
+      <Text style={styles.itemKey}>{item.key}</Text>
+      <Text style={styles.itemValue}>{value}</Text>
     </View>
   );
 };
@@ -53,9 +59,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: "4%",
   },
+  flatList: {
+    width: "95%",
+  },
   item: {
     borderColor: "grey",
     borderBottomWidth: 2,
+    height: 44,
+    paddingLeft: 4,
+    color: "black",
   },
   success: {
     backgroundColor: "#00FF00",
@@ -63,10 +75,12 @@ const styles = StyleSheet.create({
   fail: {
     backgroundColor: "red",
   },
-  itemText: {
-    height: 44,
+  itemKey: {
     fontSize: 15,
-    padding: 10,
+    paddingBottom: 4,
+  },
+  itemValue: {
+    fontSize: 12,
   },
   title: {
     fontSize: 20,
