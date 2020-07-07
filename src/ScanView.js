@@ -57,7 +57,7 @@ export default ScanView = ({ navigation }) => {
     const myDevice = DeviceInfo.getUniqueId();
     // android, ios, windows...
     const platform = DeviceInfo.getSystemName();
-    const version = DeviceInfo.getVersion();
+    const version = DeviceInfo.getSystemVersion();
 
     const locServicesEnabledBool = await DeviceInfo.isLocationEnabled();
     // A pass is if location services are OFF, i.e. not enabled
