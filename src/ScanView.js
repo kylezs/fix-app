@@ -39,8 +39,6 @@ export default ScanView = ({ navigation }) => {
             LAST_SCAN_TIME_KEY,
             result["@timestamp"].toLocaleString()
           );
-
-          return true;
         } else {
           console.error(
             "Something went wrong sending the data to the dashboard"
@@ -59,7 +57,7 @@ export default ScanView = ({ navigation }) => {
     const myDevice = DeviceInfo.getUniqueId();
     // android, ios, windows...
     const platform = DeviceInfo.getSystemName();
-    const version = DeviceInfo.getSystemVersion();
+    const version = DeviceInfo.getVersion();
 
     const locServicesEnabledBool = await DeviceInfo.isLocationEnabled();
     // A pass is if location services are OFF, i.e. not enabled
@@ -96,7 +94,6 @@ export default ScanView = ({ navigation }) => {
     try {
       const lastScan = await AsyncStorage.getItem(LAST_SCAN_TIME_KEY);
 
-      // number of milliseconds since beginning of time
       let aDayLater = new Date(lastScan);
       aDayLater.setDate(aDayLater.getDate() + 1);
 
@@ -106,7 +103,9 @@ export default ScanView = ({ navigation }) => {
         const hoursToWait = milliToWait / (1000 * 60 * 60);
         const wholeHours = Math.floor(hoursToWait);
         const wholeMinutes = Math.floor((hoursToWait - wholeHours) * 60);
-        console.log(`Can report again in ${wholeHours} and ${wholeMinutes}`);
+        console.log(
+          `Can report again in ${wholeHours} hours and ${wholeMinutes} minutes`
+        );
       }
     } catch {
       console.error("There was a problem reading from asyncStorage");
