@@ -15,43 +15,44 @@ import { RESULTS_SCREEN } from "../constants";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ES_URL });
 
-// Key for async storage last scan time, so user cannot spam scans
+// Key for async storage last scan time, so user cannot spam scans to ES
 const LAST_SCAN_TIME_KEY = "@last_scan_time";
 
 export default ScanView = ({ navigation }) => {
-  const onScan = async () => {
-    const timeOfScan = new Date();
+  const sendToES = async (result) => {
+    const resultJSON = JSON.stringify(result);
 
-    let canScan;
-    // First check if we can scan
-    try {
-      // Stored in UTC
-      const lastScan = await AsyncStorage.getItem(LAST_SCAN_TIME_KEY);
+    const config = {
+      auth: {
+        username: ES_USERNAME,
+        password: ES_PASSWORD,
+      },
+      headers: { "Content-Type": "application/json" },
+    };
 
-      // number of milliseconds since beginning of time
-      let aDayLater = new Date(lastScan);
-      aDayLater.setDate(aDayLater.getDate() + 1);
-      console.log(aDayLater);
+    axiosInstance
+      .post(ES_INDEX_PATH, resultJSON, config)
+      .then(async (res) => {
+        if (res.status === 201) {
+          // If all is successful, update the last scan time
+          await AsyncStorage.setItem(
+            LAST_SCAN_TIME_KEY,
+            result["@timestamp"].toLocaleString()
+          );
 
-      canScan = aDayLater < timeOfScan ? true : false;
-      if (!canScan) {
-        const milliToWait = aDayLater - timeOfScan;
-        const hoursToWait = (milliToWait / (1000 * 60 * 60)).toFixed(4);
-        const wholeHours = Math.floor(hoursToWait);
-        const minutesToWait = ((hoursToWait - wholeHours) * 60).toFixed(0);
+          return true;
+        } else {
+          console.error(
+            "Something went wrong sending the data to the dashboard"
+          );
+        }
+      })
+      .catch((err) => {
+        console.error("Error sending data to elasticsearch ", err);
+      });
+  };
 
-        // Currently just alerts
-        alert(
-          `You must wait ${wholeHours} hours and ${minutesToWait} minutes until you can rescan`
-        );
-        // Don't continue
-        return;
-      }
-    } catch {
-      console.error("There was a problem reading from asyncStorage");
-      return;
-    }
-
+  const getDeviceInfo = async (timeOfScan) => {
     const boolPinOrFinger = await DeviceInfo.isPinOrFingerprintSet();
     const intPinOrFinger = boolPinOrFinger ? 1 : 0;
 
@@ -84,40 +85,46 @@ export default ScanView = ({ navigation }) => {
       locationServicesPass: locServicesPassInt,
       bluetoothPass: bluetoothPass,
     };
-
-    const resultJSON = JSON.stringify(result);
-
-    const config = {
-      auth: {
-        username: ES_USERNAME,
-        password: ES_PASSWORD,
-      },
-      headers: { "Content-Type": "application/json" },
-    };
-
-    axiosInstance
-      .post(ES_INDEX_PATH, resultJSON, config)
-      .then(async (res) => {
-        if (res.status === 201) {
-          // If all is successful, update the last scan time
-          await AsyncStorage.setItem(
-            LAST_SCAN_TIME_KEY,
-            timeOfScan.toLocaleString()
-          );
-
-          navigation.push(RESULTS_SCREEN, {
-            result: result,
-          });
-        } else {
-          console.error(
-            "Something went wrong sending the data to the dashboard"
-          );
-        }
-      })
-      .catch((err) => {
-        console.error("Error sending data to elasticsearch ", err);
-      });
+    return result;
   };
+
+  const onScan = async () => {
+    const timeOfScan = new Date();
+
+    // First, check if we can scan
+    let canScan;
+    try {
+      const lastScan = await AsyncStorage.getItem(LAST_SCAN_TIME_KEY);
+
+      // number of milliseconds since beginning of time
+      let aDayLater = new Date(lastScan);
+      aDayLater.setDate(aDayLater.getDate() + 1);
+
+      canScan = aDayLater < timeOfScan ? true : false;
+      if (!canScan) {
+        const milliToWait = aDayLater - timeOfScan;
+        const hoursToWait = milliToWait / (1000 * 60 * 60);
+        const wholeHours = Math.floor(hoursToWait);
+        const wholeMinutes = Math.floor((hoursToWait - wholeHours) * 60);
+        console.log(`Can report again in ${wholeHours} and ${wholeMinutes}`);
+      }
+    } catch {
+      console.error("There was a problem reading from asyncStorage");
+      return;
+    }
+    const result = await getDeviceInfo(timeOfScan);
+
+    if (canScan) {
+      await sendToES(result);
+    }
+
+    // Even if we don't want to spam the server, we can let the user
+    // see their progress
+    navigation.push(RESULTS_SCREEN, {
+      result: result,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Please run a scan</Text>
