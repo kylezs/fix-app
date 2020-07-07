@@ -38,6 +38,6 @@
     "react-test-renderer": "~16.11.0"
   },
   "private": true,
-  "name": "fix-app",
+  "name": "fixapp",
   "version": "1.0.0"
 }

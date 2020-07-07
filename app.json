@@ -13,9 +13,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "fix-app"
@@ -24,7 +22,7 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "fix-app"
+      "package": "com.fixapp"
     },
     "entryPoint": "node_modules/expo/AppEntry.js"
   }

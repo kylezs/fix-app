@@ -131,7 +131,8 @@ android {
     }
 
     defaultConfig {
-        applicationId 'fix-app'
+        // when this is com. ,not . error
+        applicationId 'com.fixapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
