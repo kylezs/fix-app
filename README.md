@@ -18,4 +18,12 @@ Some other information sent to Elasticsearch are:
 
 The user can scan as many times as they like, but data is reported to the index a maximum of once per day.
 
-![App images](docs/images/AppImage.png)
+# Screenshots
+
+## Android
+
+![Android Results](docs/images/AndroidResults.png)
+
+## iPhone
+
+![iPhone Results](docs/images/iOSResults.png)
