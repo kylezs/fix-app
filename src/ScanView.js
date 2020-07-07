@@ -10,6 +10,7 @@ import {
   ES_USERNAME,
 } from "react-native-dotenv";
 import AsyncStorage from "@react-native-community/async-storage";
+import { BluetoothStatus } from "react-native-bluetooth-status";
 import { RESULTS_SCREEN } from "../constants";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ES_URL });
@@ -40,11 +41,11 @@ export default ScanView = ({ navigation }) => {
         const minutesToWait = ((hoursToWait - wholeHours) * 60).toFixed(0);
 
         // Currently just alerts
-        // alert(
-        //   `You must wait ${wholeHours} hours and ${minutesToWait} minutes until you can rescan`
-        // );
-        // // Don't continue
-        // return;
+        alert(
+          `You must wait ${wholeHours} hours and ${minutesToWait} minutes until you can rescan`
+        );
+        // Don't continue
+        return;
       }
     } catch {
       console.error("There was a problem reading from asyncStorage");
@@ -67,14 +68,21 @@ export default ScanView = ({ navigation }) => {
     // a pass if it's NOT jailbroken
     const isNotJailBrokenInt = isJailBroken ? 0 : 1;
 
+    const bluetoothEnabledBool = await BluetoothStatus.state();
+    // A pass if bluetooth is NOT on
+    const bluetoothPass = bluetoothEnabledBool ? 0 : 1;
+
     const result = {
+      // Metadata
       UUID: myDevice,
       "@timestamp": timeOfScan,
-      pinOrFingerPrintPass: intPinOrFinger,
-      locationServicesPass: locServicesPassInt,
       platform: platform,
       version: version,
+      // Checks
       isNotJailBroken: isNotJailBrokenInt,
+      pinOrFingerPrintPass: intPinOrFinger,
+      locationServicesPass: locServicesPassInt,
+      bluetoothPass: bluetoothPass,
     };
 
     const resultJSON = JSON.stringify(result);
@@ -90,12 +98,12 @@ export default ScanView = ({ navigation }) => {
     axiosInstance
       .post(ES_INDEX_PATH, resultJSON, config)
       .then(async (res) => {
-        console.log("Result from elastic search");
-        console.log(res);
-        console.log("res status: " + res.status);
         if (res.status === 201) {
           // If all is successful, update the last scan time
-          // await AsyncStorage.setItem(LAST_SCAN_TIME_KEY, timeOfScan);
+          await AsyncStorage.setItem(
+            LAST_SCAN_TIME_KEY,
+            timeOfScan.toLocaleString()
+          );
 
           navigation.push(RESULTS_SCREEN, {
             result: result,
