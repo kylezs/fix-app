@@ -1,15 +1,15 @@
 import React from "react";
 import { View, Text, StyleSheet, Linking } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { PRIVACY_POLICY_URL } from "./constants";
 
 export default SettingsView = () => {
-  const privacyPolicyLocation = "https://www.google.com";
   const openPrivacyPolicy = () => {
-    Linking.canOpenURL(privacyPolicyLocation).then((supported) => {
+    Linking.canOpenURL(PRIVACY_POLICY_URL).then((supported) => {
       if (supported) {
-        Linking.openURL(privacyPolicyLocation);
+        Linking.openURL(PRIVACY_POLICY_URL);
       } else {
-        console.log("Don't know how to open URL: " + privacyPolicyLocation);
+        console.log("Don't know how to open URL: " + PRIVACY_POLICY_URL);
       }
     });
   };
