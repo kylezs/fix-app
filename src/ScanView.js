@@ -118,7 +118,7 @@ export default ScanView = ({ navigation }) => {
     }
 
     // Even if we don't want to spam the server, we can let the user
-    // see their progress
+    // see their results
     navigation.push(RESULTS_SCREEN, {
       result: result,
     });
