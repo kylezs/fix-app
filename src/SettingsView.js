@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Linking } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { PRIVACY_POLICY_URL } from "./constants";
+import { PRIVACY_POLICY_URL } from "../constants";
 
 export default SettingsView = () => {
   const openPrivacyPolicy = () => {
