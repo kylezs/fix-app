@@ -1,0 +1,9 @@
+{
+	"auth": {
+		"fixapp1fadb2d7": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	}
+}
