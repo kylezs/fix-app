@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, Linking } from "react-native";
+import { View, Text, StyleSheet, Linking, Button } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { PRIVACY_POLICY_URL } from "../constants";
+import { Auth } from "aws-amplify";
 
-export default SettingsView = () => {
+export default SettingsView = (props) => {
   const openPrivacyPolicy = () => {
     Linking.canOpenURL(PRIVACY_POLICY_URL).then((supported) => {
       if (supported) {
@@ -20,6 +21,12 @@ export default SettingsView = () => {
       <TouchableOpacity onPress={openPrivacyPolicy}>
         <Text>Click here to read our Privacy Policy</Text>
       </TouchableOpacity>
+      <Button
+        title="Sign out"
+        onPress={() => {
+          Auth.signOut();
+        }}
+      />
     </View>
   );
 };

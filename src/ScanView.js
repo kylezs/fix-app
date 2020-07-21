@@ -12,6 +12,7 @@ import {
 import AsyncStorage from "@react-native-community/async-storage";
 import { BluetoothStatus } from "react-native-bluetooth-status";
 import { RESULTS_SCREEN } from "../constants";
+import { Auth } from "aws-amplify";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ES_URL });
 
@@ -35,9 +36,10 @@ export default ScanView = ({ navigation }) => {
       .then(async (res) => {
         if (res.status === 201) {
           // If all is successful, update the last scan time
+          // AsyncStorage only takes strings as values
           await AsyncStorage.setItem(
             LAST_SCAN_TIME_KEY,
-            result["@timestamp"].toLocaleString()
+            result["@timestamp"].getTime().toString()
           );
         } else {
           console.error(
@@ -50,6 +52,10 @@ export default ScanView = ({ navigation }) => {
       });
   };
 
+  /*
+    Collect a bunch of device information, including device metadata and
+    the state of particular preferences.
+  */
   const getDeviceInfo = async (timeOfScan) => {
     const boolPinOrFinger = await DeviceInfo.isPinOrFingerprintSet();
     const intPinOrFinger = boolPinOrFinger ? 1 : 0;
@@ -86,19 +92,19 @@ export default ScanView = ({ navigation }) => {
     return result;
   };
 
-  const onScan = async () => {
-    const timeOfScan = new Date();
-
+  const canSendToES = async (timeOfScan) => {
     // First, check if we can scan
-    let canScan;
+    let canSend;
+    // await AsyncStorage.removeItem(LAST_SCAN_TIME_KEY);
     try {
-      const lastScan = await AsyncStorage.getItem(LAST_SCAN_TIME_KEY);
+      const lastScanString = await AsyncStorage.getItem(LAST_SCAN_TIME_KEY);
+      const lastScan = new Date(parseInt(lastScanString));
 
       let aDayLater = new Date(lastScan);
       aDayLater.setDate(aDayLater.getDate() + 1);
 
-      canScan = aDayLater < timeOfScan ? true : false;
-      if (!canScan) {
+      canSend = aDayLater < timeOfScan ? true : false;
+      if (!canSend) {
         const milliToWait = aDayLater - timeOfScan;
         const hoursToWait = milliToWait / (1000 * 60 * 60);
         const wholeHours = Math.floor(hoursToWait);
@@ -106,22 +112,40 @@ export default ScanView = ({ navigation }) => {
         console.log(
           `Can report again in ${wholeHours} hours and ${wholeMinutes} minutes`
         );
+        return false;
       }
+      return true;
     } catch {
       console.error("There was a problem reading from asyncStorage");
-      return;
+      return false;
     }
+  };
+
+  const onScan = async () => {
+    const timeOfScan = new Date();
+    const canSend = await canSendToES(timeOfScan);
+
     const result = await getDeviceInfo(timeOfScan);
+    // Date or false
 
-    if (canScan) {
-      await sendToES(result);
-    }
-
-    // Even if we don't want to spam the server, we can let the user
-    // see their results
-    navigation.push(RESULTS_SCREEN, {
-      result: result,
-    });
+    // Ensure user is logged in
+    let email;
+    Auth.currentAuthenticatedUser()
+      .then(async (currUser) => {
+        email = currUser.attributes.email;
+        result["email"] = email;
+        if (canSend) {
+          await sendToES(result);
+        }
+        // Even if we don't want to spam the server, we can let the user
+        // see their results
+        navigation.push(RESULTS_SCREEN, {
+          result: result,
+        });
+      })
+      .catch((err) => {
+        console.error("Could not fetch user");
+      });
   };
 
   return (

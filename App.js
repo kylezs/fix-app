@@ -6,14 +6,10 @@ import React from "react";
 import {
   Authenticator,
   SignIn,
-  SignUp,
   RequireNewPassword,
   VerifyContact,
   ForgotPassword,
-  Greetings,
 } from "aws-amplify-react-native";
-import { Auth } from "aws-amplify";
-import { View, Text, Button } from "react-native";
 
 import {
   HOME_SCREEN,
@@ -24,6 +20,9 @@ import {
 import ResultsView from "./src/ResultsView";
 import ScanView from "./src/ScanView";
 import SettingsView from "./src/SettingsView";
+import AmplifyTheme from "aws-amplify-react-native/dist/AmplifyTheme";
+
+import MySignUp from "./authComponents/MySignUp";
 
 // Contain the scan screen and results screen
 const Stack = createStackNavigator();
@@ -39,53 +38,54 @@ const Home = () => {
   );
 };
 
-const AppComponents = ({ authState }) => {
-  _validAuthStates = ["signedIn"];
-  console.log("Here's the authState in App components: " + authState);
-  return (
-    <>
-      <NavigationContainer>
-        <Tab.Navigator>
-          <Tab.Screen name={HOME_SCREEN} component={Home} />
-          <Tab.Screen name={SETTINGS_SCREEN} component={SettingsView} />
-        </Tab.Navigator>
-      </NavigationContainer>
-      <Greetings />
-    </>
-  );
+const GREEN_BLUE = "#0faa9a";
+
+let theme = {
+  ...AmplifyTheme,
+  sectionFooterLink: {
+    ...AmplifyTheme.sectionFooterLink,
+    color: GREEN_BLUE,
+  },
+  sectionContent: {},
+  buttonDisabled: {
+    ...AmplifyTheme.buttonDisabled,
+    backgroundColor: GREEN_BLUE,
+  },
+  container: {
+    ...AmplifyTheme.container,
+    alignItems: "stretch",
+    justifyContent: "flex-start",
+  },
+  button: {
+    ...AmplifyTheme.button,
+    backgroundColor: GREEN_BLUE,
+  },
 };
 
-const App = () => {
-  const user = Auth.currentAuthenticatedUser()
-    .then((user) => {
-      return user;
-    })
-    .catch((err) => console.log(err));
-  if (user) {
-    return <AppComponents />;
-  } else {
-    return <CustomAuthenticator />;
-  }
-};
-
-class MySignUp extends SignUp {
+class AppComponents extends React.Component {
   constructor(props) {
     super(props);
-    this._validAuthStates = ["signUp"];
+    this._validAuthStates = ["signedIn"];
   }
 
   render() {
-    console.log("My Sign Up");
-    console.log(this.props);
-    const { authState } = this.props;
-    return (
-      <View>
-        <Text>You cannot use this app unless you are cool</Text>
-        <Button title="Sign In" onPress={() => this.changeState("signIn")} />
-      </View>
-    );
+    if (this.props.authState === "signedIn") {
+      return (
+        <NavigationContainer>
+          <Tab.Navigator>
+            <Tab.Screen name={HOME_SCREEN} component={Home} />
+            <Tab.Screen name={SETTINGS_SCREEN} component={SettingsView} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      );
+    }
+    return null;
   }
 }
+
+const App = () => {
+  return <CustomAuthenticator />;
+};
 
 const CustomAuthenticator = () => {
   return (
@@ -93,12 +93,14 @@ const CustomAuthenticator = () => {
       usernameAttributes="email"
       hideDefault={true}
       authState="signIn"
+      theme={theme}
     >
       <SignIn />
       <ForgotPassword />
       <RequireNewPassword />
       <VerifyContact />
       <MySignUp override={"SignUp"} />
+      <AppComponents />
     </Authenticator>
   );
 };

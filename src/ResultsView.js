@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 // These should not be made into a pass or fail, nor should they be coloured
-const METADATA_LIST = ["UUID", "@timestamp", "platform", "version"];
+const METADATA_LIST = ["UUID", "@timestamp", "platform", "version", "email"];
 
 export default function ResultsView({ route }) {
   const data = route.params.result;
