@@ -84,10 +84,6 @@ class AppComponents extends React.Component {
 }
 
 const App = () => {
-  return <CustomAuthenticator />;
-};
-
-const CustomAuthenticator = () => {
   return (
     <Authenticator
       usernameAttributes="email"

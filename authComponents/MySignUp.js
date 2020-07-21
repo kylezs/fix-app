@@ -12,15 +12,17 @@ class MySignUp extends SignUp {
 
   showComponent() {
     const { theme } = this.props;
-    console.log("Here's the theme");
-    console.log(theme);
+    const textStyle = {
+      paddingBottom: 10,
+      fontSize: 18,
+    };
     return (
       <View style={theme.container}>
         <View style={theme.section}>
           <View style={theme.sectionBody}>
-            <Text style={theme.label}>
+            <Text style={textStyle}>
               This app is owned and managed by Counterpart International. Please
-              contact your digital security specialist, if you would like an
+              contact your digital security specialist if you would like an
               account.
             </Text>
             <AmplifyButton
