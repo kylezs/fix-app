@@ -1,11 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import {
-  RESULT_KEY_TO_DISPLAY,
-  METADATA_KEY_TO_DISPLAY,
-  METADATA_LIST,
-} from "../constants";
+import { RESULT_KEY_TO_DISPLAY, METADATA_KEY_TO_DISPLAY } from "../constants";
 
 export default function ResultsView({ route }) {
   const data = route.params.result;
@@ -14,7 +10,7 @@ export default function ResultsView({ route }) {
 
   // Split to display in 2 different lists
   for (const property in data) {
-    if (METADATA_LIST.includes(property)) {
+    if (Object.keys(METADATA_KEY_TO_DISPLAY).includes(property)) {
       metaDataKvPairs.push({ key: property, value: data[property] });
     } else {
       checkDataKvPairs.push({ key: property, value: data[property] });

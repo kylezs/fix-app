@@ -1,8 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, Linking, Button } from "react-native";
+import { View, Text, StyleSheet, Linking } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { PRIVACY_POLICY_URL } from "../constants";
 import { Auth } from "aws-amplify";
+import { GREEN_BLUE } from "../theme";
+import { AmplifyButton } from "aws-amplify-react-native/dist/AmplifyUI";
 
 export default SettingsView = (props) => {
   const openPrivacyPolicy = () => {
@@ -21,11 +23,12 @@ export default SettingsView = (props) => {
       <TouchableOpacity onPress={openPrivacyPolicy}>
         <Text>Click here to read our Privacy Policy</Text>
       </TouchableOpacity>
-      <Button
-        title="Sign out"
+      <AmplifyButton
+        text="Sign out"
         onPress={() => {
           Auth.signOut();
         }}
+        style={styles.button}
       />
     </View>
   );
@@ -41,5 +44,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 30,
+  },
+  button: {
+    marginTop: 10,
+    backgroundColor: GREEN_BLUE,
   },
 });

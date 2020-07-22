@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { BluetoothStatus } from "react-native-bluetooth-status";
 import { RESULTS_SCREEN } from "../constants";
 import { GREEN_BLUE } from "../theme";
-import { Auth, nav } from "aws-amplify";
+import { Auth } from "aws-amplify";
 import { AmplifyButton } from "aws-amplify-react-native";
 import AmplifyTheme from "aws-amplify-react-native/dist/AmplifyTheme";
 
@@ -129,27 +129,23 @@ export default ScanView = ({ navigation }) => {
     const canSend = await canSendToES(timeOfScan);
 
     const result = await getDeviceInfo(timeOfScan);
-    // Date or false
 
     // Ensure user is logged in
     let email;
     Auth.currentAuthenticatedUser()
       .then((currUser) => {
-        console.log("current user");
-        console.log(currUser);
         email = currUser.attributes.email;
         result["email"] = email;
         if (canSend) {
           sendToES(result);
         }
-        console.log(navigation);
         navigation.push(RESULTS_SCREEN, {
           result: result,
         });
       })
       .catch(async (err) => {
         console.log("Cannot fetch user: ", err);
-        // await Auth.signOut();
+        await Auth.signOut();
       });
   };
   return (

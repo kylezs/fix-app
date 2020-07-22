@@ -14,7 +14,7 @@ export const METADATA_LIST = [
 ];
 
 export const METADATA_KEY_TO_DISPLAY = {
-  UUID: "Device UUUID",
+  UUID: "Device UUID",
   "@timestamp": "Time of scan",
   platform: "Platform",
   version: "Operating system version",
@@ -24,8 +24,7 @@ export const METADATA_KEY_TO_DISPLAY = {
 // Translate the keys sent to the backend, to a better display for the user
 export const RESULT_KEY_TO_DISPLAY = {
   isNotJailBroken: "Your device should not be jail broken",
-  pinOrFingerPrintPass:
-    "Your device should have a pin and/or fingerprint enabled",
+  pinOrFingerPrintPass: "You should have a pin and/or fingerprint enabled",
   locationServicesPass:
     "Location services should be off if you are not using them",
   bluetoothPass: "Bluetooth should be off if you are not using it",
