@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "991691366617",
+    "firebase_url": "https://fixapp-3dde2.firebaseio.com",
+    "project_id": "fixapp-3dde2",
+    "storage_bucket": "fixapp-3dde2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991691366617:android:72ad58e6584aa34dea1ec8",
+        "android_client_info": {
+          "package_name": "com.fixapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991691366617-u4l22lgvv0n5liajffll66o5qb95srt8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFRYo8226tmx2zQ-8m4GVN-YgE8wt3ENw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "991691366617-u4l22lgvv0n5liajffll66o5qb95srt8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

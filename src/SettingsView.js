@@ -19,7 +19,7 @@ export default SettingsView = (props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings Page</Text>
+      <Text style={styles.title}>Settings and Privacy</Text>
       <TouchableOpacity onPress={openPrivacyPolicy}>
         <Text>Click here to read our Privacy Policy</Text>
       </TouchableOpacity>

@@ -2,10 +2,11 @@ import { decode, encode } from "base-64";
 import { registerRootComponent } from "expo";
 import Amplify from "aws-amplify";
 import config from "./aws-exports";
+
 Amplify.configure({
   ...config,
-  Analytics: {
-    disabled: true,
+  PushNotification: {
+    requestIOSPermissions: true,
   },
 });
 

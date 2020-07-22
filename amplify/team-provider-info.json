@@ -14,6 +14,13 @@
         "categories": {
             "auth": {
                 "fixapp1fadb2d7": {}
+            },
+            "notifications": {
+                "Pinpoint": {
+                    "Name": "fixappZ6vEX-dev",
+                    "Id": "41f31a2c0b2c4720afd6a40b3b2dbdf5",
+                    "Region": "us-west-2"
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 {
     "identityPoolName": "fixapp1fadb2d7_identitypool_1fadb2d7",
-    "allowUnauthenticatedIdentities": false,
+    "allowUnauthenticatedIdentities": true,
     "resourceNameTruncated": "fixapp1fadb2d7",
     "userPoolName": "fixapp1fadb2d7_userpool_1fadb2d7",
     "autoVerifiedAttributes": [
