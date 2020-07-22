@@ -2,6 +2,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { GREEN_BLUE } from "./theme";
 
 import {
   Authenticator,
@@ -22,7 +24,7 @@ import ScanView from "./src/ScanView";
 import SettingsView from "./src/SettingsView";
 import AmplifyTheme from "aws-amplify-react-native/dist/AmplifyTheme";
 
-import MySignUp from "./authComponents/MySignUp";
+import MySignUp from "./src/authComponents/MySignUp";
 
 // Contain the scan screen and results screen
 const Stack = createStackNavigator();
@@ -37,8 +39,6 @@ const Home = () => {
     </Stack.Navigator>
   );
 };
-
-const GREEN_BLUE = "#0faa9a";
 
 let theme = {
   ...AmplifyTheme,
@@ -72,7 +72,28 @@ class AppComponents extends React.Component {
     if (this.props.authState === "signedIn") {
       return (
         <NavigationContainer>
-          <Tab.Navigator>
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ focused, color, size }) => {
+                let iconName;
+
+                if (route.name === "Home") {
+                  iconName = "home";
+                } else if (route.name === "Settings") {
+                  iconName = "gear";
+                }
+
+                // You can return any component that you like here!
+                return <Icon name={iconName} size={size} color={color} />;
+              },
+            })}
+            tabBarOptions={{
+              inactiveTintColor: GREEN_BLUE,
+              activeTintColor: "white",
+              activeBackgroundColor: GREEN_BLUE,
+              inactiveBackgroundColor: "white",
+            }}
+          >
             <Tab.Screen name={HOME_SCREEN} component={Home} />
             <Tab.Screen name={SETTINGS_SCREEN} component={SettingsView} />
           </Tab.Navigator>
@@ -96,7 +117,7 @@ const App = () => {
       <RequireNewPassword />
       <VerifyContact />
       <MySignUp override={"SignUp"} />
-      <AppComponents />
+      <AppComponents theme={theme} />
     </Authenticator>
   );
 };

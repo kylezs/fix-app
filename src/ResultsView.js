@@ -1,9 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-
-// These should not be made into a pass or fail, nor should they be coloured
-const METADATA_LIST = ["UUID", "@timestamp", "platform", "version", "email"];
+import {
+  RESULT_KEY_TO_DISPLAY,
+  METADATA_KEY_TO_DISPLAY,
+  METADATA_LIST,
+} from "../constants";
 
 export default function ResultsView({ route }) {
   const data = route.params.result;
@@ -40,18 +42,12 @@ export default function ResultsView({ route }) {
 }
 
 const MetaDataItem = ({ item }) => {
-  let value;
-  let key;
-  if (item.key === "@timestamp") {
-    key = "Time of scan";
-    value = item.value.toLocaleString();
-  } else {
-    key = item.key;
-    value = item.value;
-  }
+  const value =
+    item.key === "@timestamp" ? item.value.toLocaleString() : item.value;
+  const displayKey = METADATA_KEY_TO_DISPLAY[item.key];
   return (
     <View style={styles.metadata}>
-      <Text style={styles.itemKey}>{key}</Text>
+      <Text style={styles.itemKey}>{displayKey}</Text>
       <Text style={styles.itemValue}>{value}</Text>
     </View>
   );
@@ -60,9 +56,10 @@ const MetaDataItem = ({ item }) => {
 const CheckItem = ({ item }) => {
   const value = item.value === 1 ? "Pass" : "Fail";
   const conditionalStyle = item.value === 1 ? itemSuccess : itemFail;
+  const displayKey = RESULT_KEY_TO_DISPLAY[item.key];
   return (
     <View style={conditionalStyle}>
-      <Text style={styles.itemKey}>{item.key}</Text>
+      <Text style={styles.itemKey}>{displayKey}</Text>
       <Text style={styles.itemValue}>{value}</Text>
     </View>
   );
@@ -84,8 +81,10 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
   },
   item: {
+    marginBottom: 4,
     padding: 6,
     color: "black",
+    borderRadius: 4,
   },
   success: {
     backgroundColor: "#00FF00",

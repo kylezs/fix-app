@@ -1,7 +1,7 @@
 import axios from "axios";
 import JailMonkey from "jail-monkey";
 import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import DeviceInfo from "react-native-device-info";
 import {
   ES_INDEX_PATH,
@@ -12,7 +12,10 @@ import {
 import AsyncStorage from "@react-native-community/async-storage";
 import { BluetoothStatus } from "react-native-bluetooth-status";
 import { RESULTS_SCREEN } from "../constants";
-import { Auth } from "aws-amplify";
+import { GREEN_BLUE } from "../theme";
+import { Auth, nav } from "aws-amplify";
+import { AmplifyButton } from "aws-amplify-react-native";
+import AmplifyTheme from "aws-amplify-react-native/dist/AmplifyTheme";
 
 const axiosInstance = axios.create({ withCredentials: true, baseURL: ES_URL });
 
@@ -54,7 +57,7 @@ export default ScanView = ({ navigation }) => {
 
   /*
     Collect a bunch of device information, including device metadata and
-    the state of particular preferences.
+    the state of particular preferences. 
   */
   const getDeviceInfo = async (timeOfScan) => {
     const boolPinOrFinger = await DeviceInfo.isPinOrFingerprintSet();
@@ -131,27 +134,28 @@ export default ScanView = ({ navigation }) => {
     // Ensure user is logged in
     let email;
     Auth.currentAuthenticatedUser()
-      .then(async (currUser) => {
+      .then((currUser) => {
+        console.log("current user");
+        console.log(currUser);
         email = currUser.attributes.email;
         result["email"] = email;
         if (canSend) {
-          await sendToES(result);
+          sendToES(result);
         }
-        // Even if we don't want to spam the server, we can let the user
-        // see their results
+        console.log(navigation);
         navigation.push(RESULTS_SCREEN, {
           result: result,
         });
       })
-      .catch((err) => {
-        console.error("Could not fetch user");
+      .catch(async (err) => {
+        console.log("Cannot fetch user: ", err);
+        // await Auth.signOut();
       });
   };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Please run a scan</Text>
-      <Button onPress={onScan} title="Scan" />
+      <AmplifyButton onPress={onScan} text="Scan" style={styles.button} />
     </View>
   );
 };
@@ -166,5 +170,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 10,
+  },
+  button: {
+    ...AmplifyTheme.button,
+    backgroundColor: GREEN_BLUE,
   },
 });
